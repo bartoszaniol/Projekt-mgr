@@ -1,7 +1,21 @@
 body {
-  margin: 0;
+  margin: 2rem;
   padding: 0;
   font-family: sans-serif;
   background-color: #ccc;
-  height: 100vh;
+  height: 100%;
+}
+div {
+  margin: 0 auto;
+}
+
+.react-sigma {
+  display: flex;
+  height: 90vh !important;
+  width: 90vw !important;
+}
+canvas {
+  height: 90vh !important;
+  width: 90vw !important;
+  /* background-color: #ccc; */
 }
