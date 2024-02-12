@@ -1,15 +1,20 @@
 import CytoscapeComponent from "react-cytoscapejs";
-import data from "../../data/CytoscapeData250.json";
+import data100 from "../../data/CytoscapeData100.json";
+import data250 from "../../data/CytoscapeData250.json";
+import data500 from "../../data/CytoscapeData500.json";
+import data1000 from "../../data/CytoscapeData1000.json";
+import { useState } from "react";
 
 const App = () => {
+  const [data, setData] = useState(data100);
   const width = "100%";
   const height = "800px";
   const layout = {
-    name: "breadthfirst",
+    name: "concentric",
     fit: true,
     // circle: true,
     directed: true,
-    padding: 50,
+    padding: 25,
     // spacingFactor: 1.5,
     animate: true,
     animationDuration: 700,
@@ -21,7 +26,7 @@ const App = () => {
     {
       selector: "node",
       style: {
-        backgroundColor: "#4a56a6",
+        backgroundColor: "#00F",
         width: 50,
         height: 50,
         label: "data(label)",
@@ -35,7 +40,7 @@ const App = () => {
         //text props
         // "text-outline-color": "#4a56a6",
         // "text-outline-width": "2px",
-        color: "white",
+        color: "black",
         fontSize: 20,
       },
     },
@@ -65,7 +70,7 @@ const App = () => {
       style: {
         width: 3,
         // "line-color": "#6774cb",
-        "line-color": "#AAD8FF",
+        "line-color": "#0FF",
         "target-arrow-color": "#6774cb",
         "target-arrow-shape": "triangle",
         "curve-style": "bezier",
@@ -78,39 +83,44 @@ const App = () => {
   return (
     <>
       <div>
-        <h1>Cytoscape example</h1>
-        <div
-          style={{
-            border: "1px solid",
-            backgroundColor: "#f5f6fe",
+        <button onClick={() => setData(data100)}>100 data</button>
+        <button onClick={() => setData(data250)}>250 data</button>
+        <button onClick={() => setData(data500)}>500 data</button>
+        <button onClick={() => setData(data1000)}>1000 data</button>
+      </div>
+      <div
+        style={{
+          border: "1px solid",
+          backgroundColor: "#f5f6fe",
+        }}
+      >
+        <CytoscapeComponent
+          elements={CytoscapeComponent.normalizeElements(data)}
+          // pan={{ x: 200, y: 200 }}
+          style={{ width: width, height: height }}
+          zoomingEnabled={true}
+          maxZoom={3}
+          minZoom={0.1}
+          autounselectify={false}
+          boxSelectionEnabled={true}
+          layout={layout}
+          stylesheet={styleSheet}
+          cy={(cy) => {
+            myCyRef = cy;
+            cy.layout(layout).run();
+            cy.fit();
+
+            console.log("EVT", cy);
+
+            cy.on("tap", "node", (evt) => {
+              var node = evt.target;
+              console.log("EVT", evt);
+              console.log("TARGET", node.data());
+              console.log("TARGET TYPE", typeof node[0]);
+            });
           }}
-        >
-          <CytoscapeComponent
-            elements={CytoscapeComponent.normalizeElements(data)}
-            // pan={{ x: 200, y: 200 }}
-            style={{ width: width, height: height }}
-            zoomingEnabled={true}
-            maxZoom={3}
-            minZoom={0.1}
-            autounselectify={false}
-            boxSelectionEnabled={true}
-            layout={layout}
-            stylesheet={styleSheet}
-            cy={(cy) => {
-              myCyRef = cy;
-
-              console.log("EVT", cy);
-
-              cy.on("tap", "node", (evt) => {
-                var node = evt.target;
-                console.log("EVT", evt);
-                console.log("TARGET", node.data());
-                console.log("TARGET TYPE", typeof node[0]);
-              });
-            }}
-            abc={console.log("myCyRef", myCyRef)}
-          />
-        </div>
+          abc={console.log("myCyRef", myCyRef)}
+        />
       </div>
     </>
   );
