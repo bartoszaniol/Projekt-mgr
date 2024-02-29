@@ -8,9 +8,9 @@ import { useState } from "react";
 const App = () => {
   const [data, setData] = useState(data100);
   const width = "100%";
-  const height = "800px";
+  const height = "97vh";
   const layout = {
-    name: "concentric",
+    name: "circle",
     fit: true,
     // circle: true,
     directed: true,
@@ -26,10 +26,13 @@ const App = () => {
     {
       selector: "node",
       style: {
+        // shape: "triangle",
         backgroundColor: "#00F",
-        width: 50,
-        height: 50,
-        label: "data(label)",
+        // backgroundImage:
+        //   "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Persona_5_cover_art.jpg/220px-Persona_5_cover_art.jpg",
+        width: 10,
+        height: 10,
+        // label: "data(label)",
 
         // width: "mapData(score, 0, 0.006769776522008331, 20, 60)",
         // height: "mapData(score, 0, 0.006769776522008331, 20, 60)",

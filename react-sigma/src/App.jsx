@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { MultiDirectedGraph } from "graphology";
-import { SigmaContainer, useLoadGraph } from "@react-sigma/core";
+import {
+  SigmaContainer,
+  useLoadGraph,
+  useSigma,
+  useRegisterEvents,
+} from "@react-sigma/core";
 import { useLayoutCircular } from "@react-sigma/layout-circular";
 import "@react-sigma/core/lib/react-sigma.min.css";
 import data100 from "../../data/SigmaData100.json";
@@ -12,6 +17,9 @@ export const LoadGraph = () => {
   const loadGraph = useLoadGraph();
   const [data, setData] = useState(data100);
   const { positions, assign } = useLayoutCircular();
+  const registerEvents = useRegisterEvents();
+  const sigma = useSigma();
+  const [draggedNode, setDraggedNode] = useState(null);
   // const nodes = data.nodes;
   // const edges = data.edges;
 
@@ -24,12 +32,65 @@ export const LoadGraph = () => {
         size: 15,
         label: node.label,
         color: "blue",
+        type: "circle",
       })
     );
     data.edges.forEach((edge) => graph.addEdge(edge.from, edge.to));
     loadGraph(graph);
     assign();
-  }, [loadGraph, data]);
+    registerEvents({
+      downNode: (e) => {
+        setDraggedNode(e.node);
+        sigma.getGraph().setNodeAttribute(e.node, "highlighted", true);
+      },
+      mouseup: (e) => {
+        if (draggedNode) {
+          setDraggedNode(null);
+          sigma.getGraph().removeNodeAttribute(draggedNode, "highlighted");
+        }
+      },
+      mousedown: (e) => {
+        // Disable the autoscale at the first down interaction
+        if (!sigma.getCustomBBox()) sigma.setCustomBBox(sigma.getBBox());
+      },
+      mousemove: (e) => {
+        if (draggedNode) {
+          // Get new position of node
+          const pos = sigma.viewportToGraph(e);
+          sigma.getGraph().setNodeAttribute(draggedNode, "x", pos.x);
+          sigma.getGraph().setNodeAttribute(draggedNode, "y", pos.y);
+
+          // Prevent sigma to move camera:
+          e.preventSigmaDefault();
+          e.original.preventDefault();
+          e.original.stopPropagation();
+        }
+      },
+      touchup: (e) => {
+        if (draggedNode) {
+          setDraggedNode(null);
+          sigma.getGraph().removeNodeAttribute(draggedNode, "highlighted");
+        }
+      },
+      touchdown: (e) => {
+        // Disable the autoscale at the first down interaction
+        if (!sigma.getCustomBBox()) sigma.setCustomBBox(sigma.getBBox());
+      },
+      touchmove: (e) => {
+        if (draggedNode) {
+          // Get new position of node
+          const pos = sigma.viewportToGraph(e);
+          sigma.getGraph().setNodeAttribute(draggedNode, "x", pos.x);
+          sigma.getGraph().setNodeAttribute(draggedNode, "y", pos.y);
+
+          // Prevent sigma to move camera:
+          e.preventSigmaDefault();
+          e.original.preventDefault();
+          e.original.stopPropagation();
+        }
+      },
+    });
+  }, [loadGraph, data, registerEvents, sigma, draggedNode]);
 
   return (
     <>
